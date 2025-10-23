@@ -17,15 +17,15 @@ such as the time of the click and the application where the click occurred.
 
 ### Building the Project
 
-   Clone the repository:
-   git clone https://github.com/DeepikaRodda-698/MouseCapture.git
-   cd MouseCapture
-   dotnet build
-   dotnet run --project MouseCapture
+- Clone the repository:
+- git clone https://github.com/DeepikaRodda-698/MouseCapture.git
+- cd MouseCapture
+- dotnet build
+- dotnet run --project MouseCapture
 
 ## Usage
-•	Launch the application.
-•	The main window will display a list of mouse left button clicks, including the timestamp and the application where the click occurred.
+- Launch the application.
+- The main window will display a list of mouse left button clicks, including the timestamp and the application where the click occurred.
    
    
    
