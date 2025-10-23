@@ -1,6 +1,9 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
+using Serilog;
+
 namespace MouseCapture
 {
     public class MouseHook
@@ -8,57 +11,81 @@ namespace MouseCapture
         private static IntPtr _hookID = IntPtr.Zero;
         private static MouseHookMethods.LowLevelMouseProc _mouseHookProc;
 
-        public static void StartHook()
+        public static void StartMouseCapture()
         {
-            _mouseHookProc = HookCallback;
-            using (Process curProcess = Process.GetCurrentProcess())
+            try
             {
-                using (ProcessModule curModule = curProcess.MainModule)
+                _mouseHookProc = HookCallback;
+                using (Process curProcess = Process.GetCurrentProcess())
                 {
-                    _hookID = MouseHookMethods.SetWindowsHookEx(MouseHookMethods.WH_MOUSE_LL, _mouseHookProc, MouseHookMethods.GetModuleHandle(curModule.ModuleName), 0);
+                    using (ProcessModule curModule = curProcess.MainModule)
+                    {
+                        _hookID = MouseHookMethods.SetWindowsHookEx(MouseHookMethods.WH_MOUSE_LL, _mouseHookProc, MouseHookMethods.GetModuleHandle(curModule.ModuleName), 0);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error occurred while starting mouse capture.");
             }
         }
 
-        public static void StopHook()
+        public static void StopMouseCapture()
         {
-            MouseHookMethods.UnhookWindowsHookEx(_hookID);
+            try
+            {
+                MouseHookMethods.UnhookWindowsHookEx(_hookID);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error occurred while stopping mouse capture.");
+            }
         }
 
         private static IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
-            if (nCode >= 0 && wParam == (IntPtr)MouseHookMethods.WM_LBUTTONDOWN)
+            try
             {
-                MouseHookMethods.MOUSEHOOKSTRUCT hs = (MouseHookMethods.MOUSEHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(MouseHookMethods.MOUSEHOOKSTRUCT));
-
-                // Get the window handle at the mouse click point
-                IntPtr hWnd = MouseHookMethods.WindowFromPoint(hs.pt);
-
-                // Get the process ID associated with the window
-                uint processId;
-                MouseHookMethods.GetWindowThreadProcessId(hWnd, out processId);
-
-                try
+                if (nCode >= 0 && wParam == (IntPtr)MouseHookMethods.WM_LBUTTONDOWN) 
                 {
-                    Process targetProcess = Process.GetProcessById((int)processId);
+                    MouseHookMethods.MOUSEHOOKSTRUCT hs = (MouseHookMethods.MOUSEHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(MouseHookMethods.MOUSEHOOKSTRUCT));
 
-                    Application.Current.Dispatcher.Invoke(() =>
+                    // Get the window handle at the mouse click point  
+                    IntPtr hWnd = MouseHookMethods.WindowFromPoint(hs.pt);
+
+                    // Get the process ID associated with the window  
+                    uint processId;
+                    MouseHookMethods.GetWindowThreadProcessId(hWnd, out processId);
+
+                    try
                     {
-                        MainWindow.MouseActions.Add(new Models.MouseAction
+                        using (Process targetProcess = Process.GetProcessById((int)processId))
                         {
-                            ActionOn = DateTime.Now.ToLocalTime().ToString(),
-                            LMouseAction = nameof(MouseHookMethods.WM_LBUTTONDOWN),
-                            ApplicationName = targetProcess.ProcessName,
-                            PID = targetProcess.Id
-                        });
-                    });
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                MainWindow.MouseActions.Add(new Models.MouseAction
+                                {
+                                    ActionOn = DateTime.Now.ToLocalTime().ToString(),
+                                    LMouseAction = nameof(MouseHookMethods.WM_LBUTTONDOWN),
+                                    ApplicationName = targetProcess.ProcessName,
+                                    PID = targetProcess.Id
+                                });
+                                Log.Information($"Mouse Left button click captured on process: {targetProcess.ProcessName} (PID: {targetProcess.Id})");
+                            });
+                        }
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        Log.Error($"Could not find process with ID {processId}: {ex.Message}");
+                    }
                 }
-                catch (ArgumentException ex)
-                {
-                    Console.WriteLine($"Could not find process with ID {processId}: {ex.Message}");
-                }
+                return MouseHookMethods.CallNextHookEx(_hookID, nCode, wParam, lParam);
             }
-            return MouseHookMethods.CallNextHookEx(_hookID, nCode, wParam, lParam);
+            catch (Exception ex)
+            {
+                Log.Error("Error in HookCallback: " + ex.Message);
+                return MouseHookMethods.CallNextHookEx(_hookID, nCode, wParam, lParam);
+            }
         }
     }
 }

@@ -39,14 +39,14 @@ namespace MouseCapture
 
         private void StartBtn_Click(object sender, RoutedEventArgs e)
         {
-            MouseHook.StartHook();
+            MouseHook.StartMouseCapture();
             ((Button)sender).IsEnabled = false;
             StopButton.IsEnabled = true;
         }
 
         private void StopBtn_Click(object sender, RoutedEventArgs e)
         {
-            MouseHook.StopHook();
+            MouseHook.StopMouseCapture();
             ((Button)sender).IsEnabled = false;
             StartButton.IsEnabled = true;
         }
