@@ -1,0 +1,31 @@
+﻿<Window 
+        x:Name="MouseActionCaptureMainWindow" 
+        x:Class="MouseCapture.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MouseCapture"
+        xmlns:vm="clr-namespace:MouseCapture.ViewModels"
+        mc:Ignorable="d"
+        Title="Mouse Action Capture" Height="450" Width="800" FontFamily="Arial Black" FontWeight="Bold" Icon="/MouseCapture;component/Assets/MouseClick.png" >
+    <Window.DataContext>
+        <vm:MainViewModel />
+    </Window.DataContext>
+
+    <DockPanel Margin="8">
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="0,0,0,8">
+            <Button Content="Start" Width="80" Margin="0,0,8,0" Command="{Binding StartCommand}" Background="Green" />
+            <Button Content="Stop" Width="80" Command="{Binding StopCommand}" Background="Red" />
+            <TextBlock Text="{Binding Events.Count, StringFormat=Events: {0}}" VerticalAlignment="Center" Margin="12,0,0,0"/>
+        </StackPanel>
+
+        <ListBox ItemsSource="{Binding Events}" Margin="0" HorizontalContentAlignment="Stretch">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" TextWrapping="Wrap" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </DockPanel>
+</Window>

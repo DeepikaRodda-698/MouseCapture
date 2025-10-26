@@ -1,31 +1,29 @@
 # MouseCapture
-MouseCapture is a .NET 8 application designed to capture mouse left click events on Windows.
-It provides a simple interface for tracking mouse left button clicks and displays them in a WPF window, along with details
-such as the time of the click and the application where the click occurred.
+MouseCapture is a small WPF application (targeting .NET 8) that captures low-level mouse left-button single-click events on Windows and displays a timestamp and the application/window that received the click.
 
 ## Features
-
-- Capture mouse left button clicks in real-time
-- Display timestamp and application details for each click.
+- Captures left mouse button single clicks using a low-level Windows hook.
+- Displays timestamp and application/window details for each click.
+- Start/Stop capturing through MVVM `StartCommand` and `StopCommand`.
+- Bounded event history shown in the UI.
 
 ## Getting Started
 
+## Assumptions
+- Running on Windows (desktop) — low-level mouse hooks are platform-specific.
+- No elevated privileges are required for the hook in normal scenarios, but some environments/antivirus may interfere.
+- The application is intended only to record the mouse left button single clicks along with application clicked.
+
 ### Prerequisites
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) installed on your machine
-- Windows operating system
-
-### Building the Project
-
-- Clone the repository:
-- git clone https://github.com/DeepikaRodda-698/MouseCapture.git
-- cd MouseCapture
-- dotnet build
-- dotnet run --project MouseCapture
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- Windows desktop OS
+- Visual Studio 2022 or later (recommended) for XAML tooling
 
 ## Usage
-- Launch the application.
-- The main window will display a list of mouse left button clicks, including the timestamp and the application where the click occurred.
-   
+1. Launch the app.
+2. Click Start to begin capturing. Click Stop to end capture.
+3. Events appear in the list with timestamp and the application/window name.
+  
    
    

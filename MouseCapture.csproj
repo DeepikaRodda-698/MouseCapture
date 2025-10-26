@@ -9,8 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="generated-image.png" />
-    <None Remove="MouseClick.png" />
+    <None Remove="Assets\MouseClick.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,8 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="generated-image.png" />
-    <Resource Include="MouseClick.png" />
+    <Resource Include="Assets\MouseClick.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
 </Project>
